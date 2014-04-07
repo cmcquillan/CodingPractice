@@ -1,4 +1,22 @@
 # depslib dependency file v1.0
-1396666877 source:c:\users\karrdesw\documents\code\codingpractice\mylisp\mylisp\main.c
+1396826066 source:c:\users\karrdesw\documents\code\codingpractice\mylisp\mylisp\main.c
 	<stdio.h>
+	<stdlib.h>
+	"mpc.h"
+	"mylisp.h"
+	<string.h>
+	<editline/readline.h>
+
+1392227504 source:c:\users\karrdesw\documents\code\codingpractice\mylisp\mylisp\mpc.c
+	"mpc.h"
+
+1392227504 c:\users\karrdesw\documents\code\codingpractice\mylisp\mylisp\mpc.h
+	<stdlib.h>
+	<stdio.h>
+	<stdarg.h>
+	<string.h>
+	<math.h>
+	<errno.h>
+
+1396825731 c:\users\karrdesw\documents\code\codingpractice\mylisp\mylisp\mylisp.h
 

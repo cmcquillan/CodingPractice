@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "mpc.h"
+#include "mylisp.h"
 
 #ifdef _WIN32
 
@@ -27,10 +28,111 @@ void add_history(char *unused) {}
 //#include <editline/history.h>
 #endif // _WIN32
 
+lval eval(mpc_ast_t* t) {
+
+    if(strstr(t->tag, "number")) {
+        long x = strtol(t->contents, NULL, 10);
+        return errno != ERANGE ? lval_num(x) : lval_err(LERR_BAD_NUM);
+    }
+
+    char *op = t->children[1]->contents;
+    lval x = eval(t->children[2]);
+
+    int i = 3;
+    while(strstr(t->children[i]->tag, "expr")) {
+        x = eval_op(x, op, eval(t->children[i]));
+        i++;
+    }
+
+    return x;
+}
+
+lval eval_op(lval x, char *op, lval y) {
+
+    if(x.type == LVAL_ERR) { return x; }
+    if(y.type == LVAL_ERR) { return y; }
+
+    if(strcmp(op, "+") == 0) { return lval_num(x.num + y.num); }
+    if(strcmp(op, "-") == 0) { return lval_num(x.num - y.num); }
+    if(strcmp(op, "*") == 0) { return lval_num(x.num * y.num); }
+
+    if(strcmp(op, "/") == 0) {
+        return y.num == 0 ? lval_err(LERR_DIV_ZERO) : lval_num(x.num / y.num);
+    }
+
+    if(strcmp(op, "%") == 0) { return lval_num(x.num % y.num); }
+    if(strcmp(op, "^") == 0) { return lval_num(l_pow(x.num, y.num)); }
+
+    return lval_err(LERR_BAD_OP);
+}
+
+long l_pow(long x, long p) {
+    int result = 1;
+    while(p > 0) {
+        result *= x;
+        p--;
+    }
+    return result;
+}
+
+lval lval_num(long x) {
+    lval v;
+    v.type = LVAL_NUM;
+    v.num = x;
+    return v;
+}
+
+lval lval_err(int x) {
+    lval v;
+    v.type = LVAL_ERR;
+    v.err = x;
+    return v;
+}
+
+void lval_print(lval v) {
+    switch(v.type) {
+        /* If the type is a number we will print it */
+        case LVAL_NUM: printf("%li", v.num);
+        break;
+
+        /* If the type is an error give helpful advice */
+        case LVAL_ERR:
+            if(v.err == LERR_DIV_ZERO) { printf("Error: Division By Zero!"); }
+            if(v.err == LERR_BAD_OP) { printf("Error: Invalid Operator!"); }
+            if(v.err == LERR_BAD_NUM) { printf("Error: Invalid Number!"); }
+        break;
+    }
+}
+
+void lval_println(lval v) {
+    lval_print(v);
+    putchar('\n');
+}
+
+int count_ast_leaves(mpc_ast_t* t) {
+    if(t->children_num == 0)
+        return 1;
+    int i;
+    int leaves = 0;
+    for(i = 0; i < t->children_num; i++) {
+        leaves += count_ast_leaves(t->children[i]);
+    }
+    return leaves;
+}
+
+int count_ast_branches(mpc_ast_t* t) {
+    int ret = 0;
+    if(t->children_num > 0) {
+        ret = 1;
+        int i;
+        for(i = 0; i < t->children_num; i++) {
+            ret += count_ast_branches(t->children[i]);
+        }
+    }
+    return ret;
+}
 
 int main(int argc, char** argv) {
-
-
 
     /* Create some parsers */
     mpc_parser_t* Number    = mpc_new("number");
@@ -41,7 +143,7 @@ int main(int argc, char** argv) {
     mpca_lang(MPC_LANG_DEFAULT,
       "							\
 	number		: /-?[0-9]+/ ;			\
-	operator	: '+' | '-' | '*' | '/' ;	\
+	operator	: '+' | '-' | '*' | '/' | '%' | '^' ;	\
 	expr		: <number> | '(' <operator> <expr>+ ')' ; \
 	lispy		: /^/ <operator> <expr>+ /$/ ;	\
       ", Number, Operator, Expr, Lispy);
@@ -53,17 +155,20 @@ int main(int argc, char** argv) {
         mpc_result_t r;
 
         if(mpc_parse("<stdin>", input, Lispy, &r)) {
-            mpc_ast_print(r.output);
+            //printf("Number of Leaves: %i\n", count_ast_leaves(r.output));
+            lval result = eval(r.output);
+            lval_println(result);
+            //mpc_ast_print(r.output);
             mpc_ast_delete(r.output);
         } else {
             mpc_err_print(r.error);
             mpc_err_print(r.error);
         }
-        //printf("No you're a %s\n", input);
+
         free(input);
     }
 
-    mpc_cleanup(4, Number, Operator, Expr, Lispy); 
+    mpc_cleanup(4, Number, Operator, Expr, Lispy);
 
     return 0;
 }
