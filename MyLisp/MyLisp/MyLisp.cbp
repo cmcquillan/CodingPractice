@@ -38,6 +38,7 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="mpc.h" />
+		<Unit filename="mylisp.h" />
 		<Extensions>
 			<code_completion />
 			<debugger />
