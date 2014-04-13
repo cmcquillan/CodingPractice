@@ -43,7 +43,9 @@ long l_pow(long, long);
 lval* lval_num(long);
 lval* lval_sym(char*);
 lval* lval_fun(lbuiltin);
-lval* lval_err(char*);
+lval* lval_err(char*, ...);
+lval* lval_sexpr(void);
+lval* lval_qexpr(void);
 void lval_print(lval*);
 void lval_println(lval*);
 
@@ -61,6 +63,7 @@ lval* builtin_mod(lenv*, lval*);
 lval* lval_join(lval*, lval*);
 lval* lval_add(lval*, lval*);
 lval* builtin_len(lenv*, lval*);
+lval* builtin_def(lenv*, lval*);
 
 void lenv_add_builtin(lenv*, char*, lbuiltin);
 void lenv_add_builtins(lenv*);
@@ -69,4 +72,9 @@ lval* lenv_get(lenv*, lval*);
 void lenv_del(lenv*);
 lenv* lenv_new(void);
 
-#define LASSERT(args, cond, err) if(!(cond)) { lval_del(args); return lval_err(err); }
+#define LASSERT(args, cond, fmt, ...) \
+	if(!(cond)) { \
+		lval* err = lval_err(fmt, ##__VA_ARGS__); \
+		lval_del(args); \
+		return err; \
+	}
