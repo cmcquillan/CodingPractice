@@ -9,6 +9,8 @@
             var canvas = document.getElementById("gc");
             var ctx = canvas.getContext("2d");
             var size = 20;
+            var special = false;
+            var specialChance = 0.12;
 
             function Coord(x, y) {
                 this.x = x;
@@ -38,21 +40,36 @@
                 ctx.fillStyle = '#000';
                 ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-                // Move player                
+                // Move player
+                // Add current block to tail
+                // If we're too long then remove last tail
+                tail.push(player);
+                if (tail.length > snake) {
+                    tail.shift();
+                }
                 player = new Coord(player.x + velocity.x, player.y + velocity.y);
-                
-                // Move tail
-                for(var i = 0; i < tail.length; i++) {
 
+                // Player might be dead
+                for (var i = 0; i < tail.length; i++) {
+                    if (player.x == tail[i].x && player.y == tail[i].y) {
+                        snake = 3;
+                        score -= 10;
+                        tail = [];
+                    }
                 }
 
                 // Player eats food
                 if (player.x == food.x && player.y == food.y) {
-                    score++;
+                    if (special) {
+                        score += 10;
+                    } else {
+                        score += 1;
+                    }
                     snake++;
                     food = new Coord(
                         Math.floor(Math.random() * box.x), 
                         Math.floor(Math.random() * box.y));
+                    special = !!(Math.random() > (1 - specialChance));
                 }
 
                 // Wrap player
@@ -81,12 +98,19 @@
                 }
 
                 // Paint food
-                ctx.fillStyle = '#F00';
+                if (special) {
+                    ctx.fillStyle = '#F0F';
+                } else {
+                    ctx.fillStyle = '#F00';
+                }
+                
                 var fLoc = food.toPixels();
                 ctx.fillRect(fLoc.x, fLoc.y, size, size);
 
-
-
+                // Paint score
+                ctx.font = '20px consolas';
+                ctx.fillStyle = '#FFF';
+                ctx.fillText(score, 30, 30);
             };
 
             function onKeyPress(evt) {
