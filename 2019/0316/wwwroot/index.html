@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Add a New URL Mapping</title>
+</head>
+
+<body>
+    <h1>Add Your URL Mappings Here!</h1>
+    <div>
+        <label>
+            Enter Your URL to Shorten:
+        </label>
+        <input id="longUrl" type="text" name="longUrl" />
+        <button id="shortenButton" onclick="submitUrl();" type="button">Submit</button>
+
+    </div>
+    <div>
+        <textarea id="shortUrl" name="shortUrl">
+        </textarea>
+    </div>
+    <script>
+        function submitUrl() {
+            var longUrl = document.getElementById("longUrl");
+
+            var http = new XMLHttpRequest();
+            
+            http.onreadystatechange = function(event) {
+                console.log(event);
+            };
+
+            http.open("POST", "/add-new");
+            http.send(JSON.stringify({ longUrl: longUrl.value }));
+        };
+    </script>
+</body>
+
+</html>
