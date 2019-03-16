@@ -34,6 +34,19 @@ namespace ShortUrl
 
             // Use this middleware for URL mappings.
             app.Use(async (context, next) => {
+                var path = context.Request.Path;
+                if (path.HasValue) 
+                {
+                    var store = context.RequestServices.GetService(typeof(IUrlMappingStore)) as IUrlMappingStore;
+                    var mapping = store.GetUrlMapping(path.Value.Replace("/", ""));
+
+                    if (mapping is UrlMapping)
+                    {
+                        context.Response.Redirect(mapping.LongUrl);
+                        return;
+                    }
+                }
+
                 await next.Invoke();
             });
 

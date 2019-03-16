@@ -24,12 +24,14 @@
             var longUrl = document.getElementById("longUrl");
 
             var http = new XMLHttpRequest();
-            
-            http.onreadystatechange = function(event) {
-                console.log(event);
+            http.onload = function(event) {
+                var data = JSON.parse(http.responseText);
+                var shortUrl = document.getElementById('shortUrl');
+                shortUrl.innerText = data.shortUrl;
             };
 
             http.open("POST", "/add-new");
+            http.setRequestHeader('Content-Type', 'text/json');
             http.send(JSON.stringify({ longUrl: longUrl.value }));
         };
     </script>

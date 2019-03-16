@@ -12,11 +12,9 @@ public class UrlMappingController : Controller
     }
 
     [HttpPost("")]
-    public ActionResult<UrlMapping> AddNewUrlMapping([FromBody] ShortenRequest request)
+    public ActionResult<ShortUrlWrapper> AddNewUrlMapping([FromBody] ShortenRequest request)
     {
-        return new UrlMapping {
-            ShortUrl = request.LongUrl,
-            LongUrl = request.LongUrl,
-        };
+        var mapping = _store.SaveUrlMapping(request.LongUrl);
+        return new ShortUrlWrapper(HttpContext, mapping);
     }
 }
