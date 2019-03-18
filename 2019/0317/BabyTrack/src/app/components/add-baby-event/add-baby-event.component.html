@@ -1,0 +1,26 @@
+<h2>Add a Baby Event</h2>
+<form [formGroup]="addEventGroup">
+  <div>
+    <input value="sleep" id="sleepRadio" type="radio" formControlName="typeControl" />
+    <label for="sleepRadio">Sleep</label>
+    <input value="change" id="changeRadio" type="radio" formControlName="typeControl" />
+    <label for="changeRadio">Change</label>
+    <input value="feed" id="feedRadio" type="radio" formControlName="typeControl" />
+    <label for="feedRadio">Feeding</label>
+  </div>
+  <div>
+    <label for="note">{{ addEvent.noteLabel }}</label>
+    <div>
+      <input id="note" type="text" formControlName="noteControl" />
+    </div>
+  </div>
+  <div *ngIf="hasDuration()">
+    <label for="duration">Duration</label>
+    <div>
+      <input id="duration" type="text" formControlName="durationControl" />
+    </div>
+  </div>
+  <div>
+    <button type="submit" value="add">Add Event</button>
+  </div>
+</form>
