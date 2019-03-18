@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html>
+
+<head></head>
+
+<body>
+    <div>
+        <form id="color">
+            <input id="white" type="radio" name="color" value="white" checked /><label for="white">white</label>
+            <input id="black" type="radio" name="color" value="black" /><label for="black">black</label>
+            <input id="red" type="radio" name="color" value="red" /><label for="red">red</label>
+            <input id="blue" type="radio" name="color" value="blue" /><label for="blue">blue</label>
+            <input id="green" type="radio" name="color" value="green" /><label for="green">green</label>
+        </form>
+        
+    </div>
+    <div>
+        <form id="size">
+            <input id="size1" type="radio" name="size" value="1" /><label for="size1">1 px</label>
+            <input id="size5" type="radio" name="size" value="5" checked /><label for="size5">5 px</label>
+            <input id="size10" type="radio" name="size" value="10" /><label for="size10">10 px</label>
+            <input id="size25" type="radio" name="size" value="25" /><label for="size25">25 px</label>
+        </form>
+    </div>
+    <div>
+        <canvas id="canv" height="600" width="600">
+        </canvas>
+    </div>
+    <script>
+        var canvas = document.getElementById("canv");
+        var ctx = canvas.getContext("2d");
+        // Initial canvas
+        ctx.fillStyle = '#000';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        // Get the cursor position
+        function getCursorPosition(ce, ev) {
+            var rect = ce.getBoundingClientRect();
+            var x = ev.clientX - rect.left;
+            var y = ev.clientY - rect.top;
+            return {
+                x: x,
+                y: y
+            };
+        }
+
+        // Brush size
+        var brushSize = 1;
+        function setCurrentBrushSize() {
+            brushSize = document.forms["size"].size.value;
+        }
+
+        // Initial set
+        setCurrentBrushSize();
+
+        function setCurrentColor() {
+            switch (document.forms["color"].color.value) {
+                case 'white':
+                    ctx.fillStyle = '#FFF';
+                    break;
+                case 'black':
+                    ctx.fillStyle = '#000';
+                    break;
+                case 'red':
+                    ctx.fillStyle = '#F00';
+                    break;
+                case 'green':
+                    ctx.fillStyle = '#0F0';
+                    break;
+                case 'blue':
+                    ctx.fillStyle = '#00F';
+                    break;
+                default:
+                    ctx.fillStyle = '#FFF';
+                    break;
+            }
+        }
+
+        canvas.addEventListener("mousedown", canvasClick);
+        canvas.addEventListener("mousemove", canvasDrag);
+        canvas.addEventListener("mouseup", canvasStop);
+
+        var mouseIsDown = false;
+
+        function canvasClick(event) {
+            mouseIsDown = true;
+            setCurrentBrushSize();
+        }
+
+        function canvasDrag(event) {
+            if (mouseIsDown) {
+                var coords = getCursorPosition(canvas, event);
+                setCurrentColor();
+                ctx.beginPath();
+                ctx.arc(coords.x, coords.y, brushSize, 0, 2 * Math.PI);
+                ctx.fill();
+            }
+        }
+
+        function canvasStop(event) {
+            mouseIsDown = false;
+        }
+    </script>
+</body>
+
+</html>
