@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr"
+        crossorigin="anonymous">
+</head>
+
+<body>
+    <h1>Below is a procedural hero image.</h1>
+    <canvas id="hero" width="600" height="600">
+    </canvas>
+    <script>
+        var canvas = document.getElementById("hero");
+        var ctx = canvas.getContext("2d");
+
+        var frameRate = 1000 / 30;
+        var height = canvas.height;
+        var width = canvas.width;
+        var maxSpeed = 4;
+        var minSize = 24;
+        var maxSize = 80;
+        var spawnRate = 0.008;
+
+        window.setInterval(frame, frameRate);
+
+        function Icon(x, y, sz, v, char) {
+            this.x = x;
+            this.y = y;
+            this.sz = sz;
+            this.v = v;
+            this.charCode = char;
+
+            this.update = function() {
+                this.x = this.x + v;
+            };
+
+            this.shouldDestroy = function() {
+                if (this.x < 0 - this.sz) {
+                    console.log('deleting... ', this);
+                    return true;
+                }
+
+                return false;
+            }
+        };
+
+        // The options
+        var charOptions = ['\uf042', '\uf556', '\uf061', '\uf77d'];
+
+        // The items in place
+        var items = [];
+        items.push(new Icon(300, 300, 60, -1, '\uf042'));
+
+        function frame() {
+            ctx.fillStyle = '#000';
+            ctx.fillRect(0, 0, height, width);
+
+            for (var i = 0; i < items.length; i++) {
+                var cur = items[i];
+                cur.update();
+
+                // Blue
+                ctx.fillStyle = '#00F';
+                ctx.font = cur.sz + 'px FontAwesome';
+                ctx.fillText(cur.charCode, cur.x, cur.y);
+            }
+
+            items = items.filter(function(elem) { return !elem.shouldDestroy() });
+            var spawn = Math.random();
+
+            if (spawn <= spawnRate) {
+                console.log('spawn!', spawn);
+                var randSize = Math.max(Math.random() * maxSize, minSize);
+                randSize = Math.floor(randSize);
+                // -1 to go 'backwards'
+                var randSpeed = Math.min(1, Math.random() * maxSpeed) * -1; 
+
+                var startX = width + randSize + 1;
+                var startY = Math.floor(Math.random() * height);
+                var char = charOptions[Math.floor(Math.random() * charOptions.length)];
+
+                items.push(new Icon(startX, startY, randSize, randSpeed, char));
+            }
+        };
+    </script>
+    <ul>
+        <li>
+            <span style="font-size: 1em; color: cyan;">
+                <i class="fas fa-adjust"></i>
+            </span>
+        </li>
+        <li>
+            <span style="font-size: 1em; color: cyan;">
+                <i class="fas fa-angry"></i>
+            </span>
+        </li>
+        <li>
+            <span style="font-size: 1em; color: cyan;">
+                <i class="fas fa-arrow-right"></i>
+            </span>
+        </li>
+        <li>
+            <span style="font-size: 1em; color: cyan;">
+                <i class="fas fa-baby-carriage"></i>
+            </span>
+        </li>
+    </ul>
+</body>
+
+</html>
