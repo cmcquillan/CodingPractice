@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html>
+    <head>
+
+    </head>
+    <body>
+        <canvas id="gc" width="600" height="600">
+
+        </canvas>
+
+        <script>
+            var canvas = document.getElementById("gc");
+            var ctx = canvas.getContext("2d");
+            var height = canvas.height;
+            var width = canvas.width;
+
+            var pw = 90;
+            var ph = 18
+
+            function Coord(x, y) {
+                this.x = x;
+                this.y = y;
+            };
+
+            leftPressed = false;
+            rightPressed = false;
+
+            function Platform(l, h, w, v) {
+                this.loc = l;
+                this.height = h;
+                this.width = w;
+                this.direction = v;
+
+                this.update = function(lp, rp) {
+                    var xv = 0;
+
+                    if (lp) {
+                        console.log('going left');
+                        xv--;
+                    }
+                    if (rp) {
+                        console.log('going right');
+                        xv++;
+                    }
+
+                    this.go(new Coord(xv, 0));
+                    var newX = this.loc.x + this.direction.x;
+                    this.loc = new Coord(newX, this.loc.y);  
+                };
+
+                this.draw = function() {
+                    ctx.fillStyle = '#FFF';
+                    var x = this.loc.x - this.width / 2;
+                    var y = this.loc.y - this.height / 2;
+                    ctx.fillRect(x, y, this.width, this.height);
+                }
+
+                this.go = function(dir) {
+                    this.direction = dir;
+                    console.log('going in...', dir);
+                }
+            }
+
+            var startX = (width / 2) - (pw / 2);
+            var startY = height - 30;
+            var platform = new Platform(new Coord(startX, startY), ph, pw, new Coord(0, 0));
+
+            window.addEventListener("keydown", onKeyDown);
+            window.addEventListener("keyup", onKeyUp);
+
+            window.setTimeout(gameFrame, 1000 / 15);
+
+            function gameFrame() {
+                ctx.fillStyle = '#000';
+                ctx.fillRect(0, 0, width, height);
+
+                // Move platform if necessary
+                platform.update(leftPressed, rightPressed);
+                platform.draw();
+            };
+
+            function onKeyDown(ke) {
+                console.log(ke);
+                if(ke.keyCode == 37) {
+                    leftPressed = true;
+                }
+
+                if(ke.keyCode == 39) {
+                    rightPressed = true;
+                }
+
+                console.log(leftPressed, rightPressed);
+            };
+
+            function onKeyUp(ke) {
+                console.log(ke);
+                if(ke.keyCode == 37) {
+                    leftPressed = false;
+                }
+
+                if(ke.keyCode == 39) {
+                    rightPressed = false;
+                }
+
+                console.log(leftPressed, rightPressed);
+            };
+
+        </script>
+    </body>
+</html>
