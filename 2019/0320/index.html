@@ -15,7 +15,11 @@
             var width = canvas.width;
 
             var pw = 90;
-            var ph = 18
+            var ph = 18;
+            var platSpeed = 15;
+            var ballSpeed = 10;
+            var bw = 50;
+            var bh = 18;
 
             function Coord(x, y) {
                 this.x = x;
@@ -35,14 +39,24 @@
                     var xv = 0;
 
                     if (lp) {
-                        xv--;
+                        xv -= platSpeed;
                     }
                     if (rp) {
-                        xv++;
+                        xv += platSpeed;
                     }
 
                     this.go(new Coord(xv, 0));
                     var newX = this.loc.x + this.direction.x;
+
+                    var leftPoint = 0 + (this.width / 2);
+                    if (newX < leftPoint) {
+                        newX = leftPoint;
+                    }
+                    var rightPoint = width - (this.width / 2);
+                    if (newX > rightPoint) {
+                        newX = rightPoint;
+                    }
+
                     this.loc = new Coord(newX, this.loc.y);
                 };
 
@@ -58,22 +72,128 @@
                 }
             }
 
-            var startX = (width / 2) - (pw / 2);
+            function Ball(l, v) {
+                this.loc = l;
+                this.direction = v;
+
+                this.update = function() {
+
+                    if (this.loc.x <= 0 || this.loc.x >= width) {
+                        this.direction = new Coord(this.direction.x * -1, this.direction.y);
+                    }
+
+                    if (this.loc.y < 0) {
+                        this.direction = new Coord(this.direction.x, this.direction.y * -1);
+                    }
+
+                    var newX = this.loc.x + this.direction.x;
+                    var newY = this.loc.y + this.direction.y;
+                    this.loc = new Coord(newX, newY);
+                };
+
+                this.draw = function() {
+                    ctx.strokeStyle = '#F00';
+                    ctx.beginPath();
+                    ctx.arc(this.loc.x, this.loc.y, 10, 0, 2*Math.PI);
+                    ctx.stroke();
+                };
+            }
+
+            function Brick(l, h, w) {
+                this.loc = l;
+                this.height = h;
+                this.width = w;
+
+                this.draw = function() {
+                    var x = this.loc.x - (this.width / 2);
+                    var y = this.loc.y - (this.height / 2);
+
+                    ctx.fillStyle = '#FFF';
+                    ctx.fillRect(x, y, this.width, this.height);
+                };
+            };
+
+            function hasCollided(ball, brick) {
+                var xDist = ball.loc.x - brick.loc.x;
+                var yDist = ball.loc.y - brick.loc.y;
+
+            };
+
+            var bricks = [
+                new Brick(new Coord(40, 20), bh, bw),
+                new Brick(new Coord(100, 20), bh, bw),
+                new Brick(new Coord(160, 20), bh, bw),
+                new Brick(new Coord(220, 20), bh, bw),
+                new Brick(new Coord(280, 20), bh, bw),
+                new Brick(new Coord(340, 20), bh, bw),
+                new Brick(new Coord(400, 20), bh, bw),
+                new Brick(new Coord(460, 20), bh, bw),
+                new Brick(new Coord(520, 20), bh, bw),
+                new Brick(new Coord(40, 40), bh, bw),
+                new Brick(new Coord(100, 40), bh, bw),
+                new Brick(new Coord(160, 40), bh, bw),
+                new Brick(new Coord(220, 40), bh, bw),
+                new Brick(new Coord(280, 40), bh, bw),
+                new Brick(new Coord(340, 40), bh, bw),
+                new Brick(new Coord(400, 40), bh, bw),
+                new Brick(new Coord(460, 40), bh, bw),
+                new Brick(new Coord(520, 40), bh, bw),
+                new Brick(new Coord(40, 60), bh, bw),
+                new Brick(new Coord(100, 60), bh, bw),
+                new Brick(new Coord(160, 60), bh, bw),
+                new Brick(new Coord(220, 60), bh, bw),
+                new Brick(new Coord(280, 60), bh, bw),
+                new Brick(new Coord(340, 60), bh, bw),
+                new Brick(new Coord(400, 60), bh, bw),
+                new Brick(new Coord(460, 60), bh, bw),
+                new Brick(new Coord(520, 60), bh, bw),
+                new Brick(new Coord(40, 80), bh, bw),
+                new Brick(new Coord(100, 80), bh, bw),
+                new Brick(new Coord(160, 80), bh, bw),
+                new Brick(new Coord(220, 80), bh, bw),
+                new Brick(new Coord(280, 80), bh, bw),
+                new Brick(new Coord(340, 80), bh, bw),
+                new Brick(new Coord(400, 80), bh, bw),
+                new Brick(new Coord(460, 80), bh, bw),
+                new Brick(new Coord(520, 80), bh, bw),
+                new Brick(new Coord(40, 100), bh, bw),
+                new Brick(new Coord(100, 100), bh, bw),
+                new Brick(new Coord(160, 100), bh, bw),
+                new Brick(new Coord(220, 100), bh, bw),
+                new Brick(new Coord(280, 100), bh, bw),
+                new Brick(new Coord(340, 100), bh, bw),
+                new Brick(new Coord(400, 100), bh, bw),
+                new Brick(new Coord(460, 100), bh, bw),
+                new Brick(new Coord(520, 100), bh, bw),
+            ];
+
+            var startX = (width / 2);
             var startY = height - 30;
             var platform = new Platform(new Coord(startX, startY), ph, pw, new Coord(0, 0));
+            var ball = new Ball(new Coord(startX, startY - 10), new Coord(ballSpeed, -ballSpeed));
 
             window.addEventListener("keydown", onKeyDown);
             window.addEventListener("keyup", onKeyUp);
 
-            window.setInterval(gameFrame, 1000 / 15);
+            window.setInterval(gameFrame, 1000 / 30);
 
             function gameFrame() {
                 ctx.fillStyle = '#000';
                 ctx.fillRect(0, 0, width, height);
 
+                // Draw the bricks
+                for (var i = 0; i < bricks.length; i++) {
+                    bricks[i].draw();
+                }
+
                 // Move platform if necessary
                 platform.update(leftPressed, rightPressed);
                 platform.draw();
+
+                // Draw the ball
+                ball.update();
+                ball.draw();
+
             };
 
             function onKeyDown(ke) {
