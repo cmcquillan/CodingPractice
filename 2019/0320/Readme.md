@@ -7,3 +7,4 @@ A simple Arkanoid clone where there is a platform that can move back and forth o
 
 ## Outcomes
 * After 25 minutes ended up in a debugging loop with a strange browser behavior.  Sometimes this happens so I am going to do another 25 minute sprint after I have figured out the issue.
+* It was a setTimeout and not a setInterval...

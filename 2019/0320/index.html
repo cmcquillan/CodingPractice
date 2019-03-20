@@ -35,17 +35,15 @@
                     var xv = 0;
 
                     if (lp) {
-                        console.log('going left');
                         xv--;
                     }
                     if (rp) {
-                        console.log('going right');
                         xv++;
                     }
 
                     this.go(new Coord(xv, 0));
                     var newX = this.loc.x + this.direction.x;
-                    this.loc = new Coord(newX, this.loc.y);  
+                    this.loc = new Coord(newX, this.loc.y);
                 };
 
                 this.draw = function() {
@@ -57,7 +55,6 @@
 
                 this.go = function(dir) {
                     this.direction = dir;
-                    console.log('going in...', dir);
                 }
             }
 
@@ -68,7 +65,7 @@
             window.addEventListener("keydown", onKeyDown);
             window.addEventListener("keyup", onKeyUp);
 
-            window.setTimeout(gameFrame, 1000 / 15);
+            window.setInterval(gameFrame, 1000 / 15);
 
             function gameFrame() {
                 ctx.fillStyle = '#000';
@@ -80,7 +77,6 @@
             };
 
             function onKeyDown(ke) {
-                console.log(ke);
                 if(ke.keyCode == 37) {
                     leftPressed = true;
                 }
@@ -88,12 +84,9 @@
                 if(ke.keyCode == 39) {
                     rightPressed = true;
                 }
-
-                console.log(leftPressed, rightPressed);
             };
 
             function onKeyUp(ke) {
-                console.log(ke);
                 if(ke.keyCode == 37) {
                     leftPressed = false;
                 }
@@ -101,8 +94,6 @@
                 if(ke.keyCode == 39) {
                     rightPressed = false;
                 }
-
-                console.log(leftPressed, rightPressed);
             };
 
         </script>
